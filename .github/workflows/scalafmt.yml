@@ -1,0 +1,26 @@
+name: Check scalafmt on push
+
+on:
+  push:
+    branches:
+      - "**"
+    tags-ignore:
+      - "**"
+    paths:
+      - "*.sbt"
+      - "*.scala"
+
+jobs:
+  scalafmt-lint:
+    name: Scalafmt
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/checkout@v3
+        with:
+          repository: garnercorp/.github
+          path: garnercorp.github
+      - name: Checking your scala code formatting
+        uses: GarnerCorp/scalafmt-ci@master
+        with:
+          args: "--list --test"
