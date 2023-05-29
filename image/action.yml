@@ -41,6 +41,9 @@ inputs:
   rc-tag:
     description: "Tag used for release candidates"
     required: false
+  build-context:
+    description: "The context for the docker"
+    required: false
 
 runs:
   using: 'composite'
@@ -81,5 +84,6 @@ runs:
         PLATFORMS: ${{ inputs.platforms }}
         WORKING_DIRECTORY: ${{ inputs.working-directory }}
         DOCKERFILE: ${{ inputs.dockerfile }}
+        BUILD_CONTEXT: ${{ inputs.build-context || inputs.working-directory }}
       run: |
-        "$GITHUB_ACTION_PATH/../scripts/docker-build-push.sh" -r "$REPOSITORY" -i "$IMAGE" -t "$TAG" -e "$RC" -p "$PLATFORMS" -d "$WORKING_DIRECTORY" -f "$DOCKERFILE"
+        "$GITHUB_ACTION_PATH/../scripts/docker-build-push.sh" -r "$REPOSITORY" -i "$IMAGE" -t "$TAG" -e "$RC" -p "$PLATFORMS" -d "$WORKING_DIRECTORY" -f "$DOCKERFILE" -c "$BUILD_CONTEXT"
