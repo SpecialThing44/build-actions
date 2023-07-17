@@ -54,12 +54,30 @@ inputs:
     description: GitHub Token or PAT token used to authenticate against a repository
     required: false
     default: ${{ github.token }}
+  push-to-remote:
+    description: Whether or not to push prettified code to a remote
+    required: false
+    default: "true"
+  checkout:
+    description: Whether or not to checkout the repository you are currently working in
+    required: false
+    default: "true"
 
 runs:
   using: "composite"
   steps:
     - name: Clone repository
       uses: actions/checkout@v3
+      working-directory: ${{ inputs.working-directory }}
+      if: inputs.checkout == 'true'
+
+    - name: Stub remote to suppress pushes
+      if: inputs.push-to-remote != 'true'
+      working-directory: ${{ inputs.working-directory }}
+      shell: bash
+      run:
+        git remote rename origin github;
+        git remote add origin .
 
     - name: Prettify code!
       shell: bash
@@ -77,6 +95,16 @@ runs:
         INPUT_PRETTIER_PLUGINS: ${{ inputs.prettier-plugins }}
         INPUT_WORKING_DIRECTORY: ${{ inputs.working-directory }}
         INPUT_GITHUB_TOKEN: ${{ inputs.github-token }}
+
+    - name: Check for changes
+      if: inputs.push-to-remote != 'true'
+      working-directory: ${{ inputs.working-directory }}
+      shell: bash
+      run: |
+        if ! git diff $GITHUB_SHA..HEAD --exit-code > /dev/null; then
+          git log $GITHUB_SHA..HEAD | cat
+          exit 1
+        fi
 
 branding:
   icon: "award"
