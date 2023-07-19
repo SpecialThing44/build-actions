@@ -35,7 +35,7 @@ inputs:
     required: false
     default: "false"
   prettier-version:
-    description: Specific version of prettier (by default just use the latest version)
+    description: Version of prettier to use. Otherwise defaults to latest prettier version unless detect-prettier-version is specified. 
     required: false
     default: "false"
   working-directory:
@@ -62,6 +62,10 @@ inputs:
     description: Whether or not to checkout the repository you are currently working in
     required: false
     default: "true"
+  detect-prettier-version:
+    description: Whether or not to detect the prettier version from devDependencies
+    required: false
+    default: "true"
 
 runs:
   using: "composite"
@@ -79,6 +83,15 @@ runs:
         git remote rename origin github;
         git remote add origin .
 
+    - name: Get prettier version from dependencies
+      id: get-prettier-version
+      if: inputs.detect-prettier-version == 'true'
+      working-directory: ${{ inputs.working-directory }}
+      shell: bash
+      run: |
+        prettier_version=$(jq -r '.devDependencies.prettier' package.json)
+        echo "prettier_version=$prettier_version" >> $GITHUB_OUTPUT
+
     - name: Prettify code!
       shell: bash
       run: ${{ github.action-path }}/entrypoint.sh
@@ -90,7 +103,7 @@ runs:
         INPUT_FILE_PATTERN: ${{ inputs.file-pattern }}
         INPUT_PRETTIER_OPTIONS: ${{ inputs.prettier-options }}
         INPUT_DRY: ${{ inputs.dry }}
-        INPUT_PRETTIER_VERSION: ${{ inputs.prettier-version }}
+        INPUT_PRETTIER_VERSION: ${{ steps.get-prettier-version.outputs.prettier_version || inputs.prettier-version }}
         INPUT_ONLY_CHANGED: ${{ inputs.only-changed }}
         INPUT_PRETTIER_PLUGINS: ${{ inputs.prettier-plugins }}
         INPUT_WORKING_DIRECTORY: ${{ inputs.working-directory }}
