@@ -15,7 +15,7 @@ inputs:
   same-commit:
     description: Update the current commit instead of creating a new one
     required: false
-    default: false
+    default: "false"
   commit-options:
     description: Commit options
     required: false
@@ -33,19 +33,19 @@ inputs:
   dry:
     description: Running the script in dry mode just shows whether there are files that should be prettified or not
     required: false
-    default: false
+    default: "false"
   prettier-version:
     description: Specific version of prettier (by default just use the latest version)
     required: false
-    default: false
+    default: "false"
   working-directory:
     description: Specify a directory to cd into before installing prettier and running it
     required: false
-    default: false
+    default: "false"
   only-changed:
     description: Only prettify files changed in the last commit, can't be used with file-pattern!
     required: false
-    default: false
+    default: "false"
   prettier-plugins:
     description: Install Prettier plugins, i.e. `@prettier/plugin-php @prettier/plugin-other`
     required: false
