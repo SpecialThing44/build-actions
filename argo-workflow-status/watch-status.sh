@@ -2,9 +2,13 @@
 git_sha="$1"
 pull_request="$2"
 
+summarize_and_quit() {
+  echo "$1" | tee "$GITHUB_STEP_SUMMARY"
+  exit $2
+}
+
 if [ -z "$git_sha" ]; then
-  echo "Usage $0 GIT_SHA [PULL_REQUEST]"
-  exit 1
+  summarize_and_quit "Usage $0 GIT_SHA [PULL_REQUEST]" 1
 fi
 
 if [ -z "$pull_request" ]; then
