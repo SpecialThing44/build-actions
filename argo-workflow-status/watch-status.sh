@@ -7,6 +7,25 @@ summarize_and_quit() {
   exit $2
 }
 
+check_for_updates() {
+  if [ -n "$CHECK_FOR_UPDATES_DIR" ]; then
+    (
+      cd "$CHECK_FOR_UPDATES_DIR"
+      git fetch && git checkout FETCH_HEAD
+    )
+    if [ ! -e "$CHECK_FOR_UPDATES_FILE" ]; then
+      summarize_and_quit "check-for-updates-file '$CHECK_FOR_UPDATES_FILE' no longer exists" 2
+    fi
+    if [ ! -s "$CHECK_FOR_UPDATES_FILE" ]; then
+      summarize_and_quit "check-for-updates-file '$CHECK_FOR_UPDATES_FILE' is empty" 3
+    fi
+    NEW_SHA_VALUE=$(cat "$CHECK_FOR_UPDATES_FILE")
+    if [ "$git_sha" != "$NEW_SHA_VALUE" ]; then
+      summarize_and_quit "check-for-updates-file '$CHECK_FOR_UPDATES_FILE' now refers to a new value: $NEW_SHA_VALUE" 4
+    fi
+  fi
+}
+
 if [ -z "$git_sha" ]; then
   summarize_and_quit "Usage $0 GIT_SHA [PULL_REQUEST]" 1
 fi
@@ -15,9 +34,14 @@ if [ -z "$pull_request" ]; then
   pull_request="master"
 fi
 
+if [ -n "$CHECK_FOR_UPDATES_FILE" ]; then
+  CHECK_FOR_UPDATES_DIR=$(dirname "$CHECK_FOR_UPDATES_FILE")
+fi
+
 export workflow_name="${pull_request}-${git_sha}"
 
 while true; do
+  check_for_updates
   workflow_status=$(
     kubectl get -n e2e-tests workflow/$workflow_name -o json 2>/dev/null |
     jq -r .status.phase
@@ -40,6 +64,7 @@ if [ "$workflow_status" = "Succeeded" ]; then
 fi
 
 while true; do
+  check_for_updates
   e2e_pod=$(
     kubectl get pods -n e2e-tests -l "$POD_LABEL_NAME=$POD_LABEL_VALUE" --sort-by=.status.startTime --no-headers |
     perl -ne 'next unless /$ENV{workflow_name}/; s/^\s*(\S+).*/$1/; print;' |

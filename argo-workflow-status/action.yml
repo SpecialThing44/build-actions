@@ -19,6 +19,10 @@ inputs:
     required: false
     default: ""
     description: 'Store log output to a file'
+  check-for-updates-file:
+    required: false
+    default: ""
+    description: 'Path in a git repository containing a file to check to make sure the run hasn''t been obsoleted'
 
 outputs:
   log:
@@ -36,3 +40,4 @@ runs:
         CAPTURE_LOG: ${{ inputs.capture-log }}
         POD_LABEL_NAME: ${{ inputs.pod-label-name }}
         POD_LABEL_VALUE: ${{ inputs.pod-label-value }}
+        CHECK_FOR_UPDATES_FILE: ${{ inputs.check-for-updates-file }}
