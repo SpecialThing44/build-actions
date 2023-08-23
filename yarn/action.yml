@@ -85,7 +85,19 @@ runs:
         THIS_ACTION_PATH: ${{ github.action_path }}
       run: |
         echo "::add-matcher::${THIS_ACTION_PATH}/reporter.json"
+        if ! command -v yarn >/dev/null; then
+          corepack enable
+          corepack prepare yarn@stable --activate
+        fi
         yarn set version berry
+
+    - name: Ensure yarn is available
+      shell: bash
+      if: inputs.yarn-use-berry != 'true'
+      run: |
+        if ! command -v yarn >/dev/null; then
+          npm install --global yarn
+        fi
 
     - name: Get yarn cache directory path (yarn berry)
       if: inputs.yarn-use-berry == 'true'

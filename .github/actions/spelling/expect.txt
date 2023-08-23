@@ -1,4 +1,5 @@
 amd
+corepack
 debian
 garnercorp
 gcloud
