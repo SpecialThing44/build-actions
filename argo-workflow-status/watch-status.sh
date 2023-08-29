@@ -3,7 +3,7 @@ git_sha="$1"
 pr_number_or_branch="$2"
 
 summarize_and_quit() {
-  echo "$1" | tee "$GITHUB_STEP_SUMMARY"
+  echo "$1" | tee -a "$GITHUB_STEP_SUMMARY"
   exit $2
 }
 
@@ -39,6 +39,10 @@ if [ -n "$CHECK_FOR_UPDATES_FILE" ]; then
 fi
 
 export workflow_name="${pr_number_or_branch}-${git_sha}"
+
+if [ -n "$ARGO_URL_BASE" ]; then
+  echo "::notice ::Looking for $ARGO_URL_BASE/workflows/e2e-tests/$workflow_name" | tee -a "$GITHUB_STEP_SUMMARY"
+fi
 
 while true; do
   check_for_updates
