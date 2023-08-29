@@ -1,6 +1,6 @@
 #!/bin/sh -e
 git_sha="$1"
-pull_request="$2"
+pr_number_or_branch="$2"
 
 summarize_and_quit() {
   echo "$1" | tee "$GITHUB_STEP_SUMMARY"
@@ -27,18 +27,18 @@ check_for_updates() {
 }
 
 if [ -z "$git_sha" ]; then
-  summarize_and_quit "Usage $0 GIT_SHA [PULL_REQUEST]" 1
+  summarize_and_quit "Usage $0 GIT_SHA [PR_NUMBER_OR_BRANCH]" 1
 fi
 
-if [ -z "$pull_request" ]; then
-  pull_request="master"
+if [ -z "$pr_number_or_branch" ]; then
+  pr_number_or_branch="master"
 fi
 
 if [ -n "$CHECK_FOR_UPDATES_FILE" ]; then
   CHECK_FOR_UPDATES_DIR=$(dirname "$CHECK_FOR_UPDATES_FILE")
 fi
 
-export workflow_name="${pull_request}-${git_sha}"
+export workflow_name="${pr_number_or_branch}-${git_sha}"
 
 while true; do
   check_for_updates
