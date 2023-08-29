@@ -27,6 +27,10 @@ inputs:
     required: false
     default: ""
     description: 'Base path to argo web interface'
+  google-cloud-project-id:
+    required: false
+    default: ""
+    description: 'Google Cloud Project id for use with Google Cloud urls'
 
 outputs:
   log:
@@ -46,3 +50,4 @@ runs:
         POD_LABEL_VALUE: ${{ inputs.pod-label-value }}
         CHECK_FOR_UPDATES_FILE: ${{ inputs.check-for-updates-file }}
         ARGO_URL_BASE: ${{ inputs.argo-url-base }}
+        GOOGLE_CLOUD_PROJECT_ID: ${{ inputs.google-cloud-project-id }}

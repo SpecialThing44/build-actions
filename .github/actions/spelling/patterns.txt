@@ -9,6 +9,12 @@
 # hex digits including css/html color classes:
 (?:[\\0][xX]|\\u|[uU]\+|#x?|\%23)[0-9_a-fA-FgGrR]*?[a-fA-FgGrR]{2,}[0-9_a-fA-FgGrR]*(?:[uUlL]{0,3}|u\d+)\b
 
+# Automatically suggested patterns
+# hit-count: 5 file-count: 1
+# URL escaped characters
+\%[0-9A-F][A-F]
+
+
 # problem matchers
 "regexp": ".*"
 
