@@ -38,6 +38,8 @@ runs:
     - name: Validate inputs
       if: ${{ !inputs.repository || !inputs.ssh-key || !inputs.name || !inputs.mail }}
       shell: bash
+      env:
+        INPUTS: ${{ toJSON(inputs) }}
       run: |
         "$GITHUB_ACTION_PATH/../scripts/report-missing-inputs.pl"
     - name: Validate needs
