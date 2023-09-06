@@ -36,7 +36,10 @@ while (<INPUT>) {
     }
 }
 
+open my $github_step_summary, '>>', $ENV{GITHUB_STEP_SUMMARY};
+
 if (@codependent && %inputs) {
+    my $warned_about_missing_codependent;
     for my $dependents (@codependent) {
         my $expected = 0;
         my $found = 0;
@@ -51,15 +54,27 @@ if (@codependent && %inputs) {
             }
         }
         if ($found && $expected != $found) {
-            print "::error ::Codependent inputs (".join(', ', @dependents).") need: ".join(', ', @needed)."\n";
+            my $codependent_message = "Codependent inputs (".join(', ', @dependents).") need: ".join(', ', @needed)."\n";
+            print "::error ::$codependent_message";
+            unless ($warned_about_missing_codependent) {
+                print $github_step_summary "## :x: Unsatisfied codependent inputs\n\n";
+                $warned_about_missing_codependent = 1;
+            }
+            print $github_step_summary $codependent_message;
             $status |= 2;
         }
+    }
+    if ($warned_about_missing_codependent) {
+        print $github_step_summary "\n";
     }
 }
 
 if (@required) {
     print "::error ::Some required inputs are missing\n";
     print '::notice ::Required inputs: ['.join(', ', @required)."]\n";
+    print $github_step_summary "## :x: Missing required inputs\n\n".
+        'Required inputs: ['.join(', ', @required)."]\n";
     $status |= 1;
 }
+close $github_step_summary;
 exit $status;
