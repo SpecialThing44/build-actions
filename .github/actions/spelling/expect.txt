@@ -1,5 +1,6 @@
 amd
 argoproj
+codependent
 corepack
 debian
 garnercorp
