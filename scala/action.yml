@@ -72,6 +72,15 @@ inputs:
 runs:
   using: 'composite'
   steps:
+    - name: Validate inputs
+      if: ${{ !inputs.google-credentials-json != !inputs.google-cloud-sdk-version || !inputs.maven-username != !inputs.maven-password }}
+      shell: bash
+      env:
+        CODEPENDENT: '[ [ "google-cloud-sdk-version", "google-credentials-json" ], [ "maven-username", "maven-password" ] ]'
+        INPUTS: ${{ toJSON(inputs) }}
+      run: |
+        "$GITHUB_ACTION_PATH/../scripts/report-missing-inputs.pl"
+
     - name: Checkout
       if: ${{ ! inputs.skip-checkout }}
       uses: actions/checkout@v3
