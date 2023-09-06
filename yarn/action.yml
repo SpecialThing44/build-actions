@@ -70,6 +70,24 @@ inputs:
 runs:
   using: 'composite'
   steps:
+    - name: Validate inputs (yarn berry)
+      if: ${{ !inputs.google-credentials-json != !inputs.google-cloud-sdk-version || (inputs.yarn-use-berry == 'true' && !inputs.npm-username != !inputs.npm-password) }}
+      shell: bash
+      env:
+        CODEPENDENT: '[ [ "google-cloud-sdk-version", "google-credentials-json" ], [ "npm-username", "npm-password" ] ]'
+        INPUTS: ${{ toJSON(inputs) }}
+      run: |
+        "$GITHUB_ACTION_PATH/../scripts/report-missing-inputs.pl"
+
+    - name: Validate inputs (yarn v1)
+      if: ${{ !inputs.google-credentials-json != !inputs.google-cloud-sdk-version || (inputs.yarn-use-berry != 'true' && (!inputs.npm-username != !inputs.npm-password || !inputs.npm-username != !inputs.npm-email)) }}
+      shell: bash
+      env:
+        CODEPENDENT: '[ [ "google-cloud-sdk-version", "google-credentials-json" ], [ "npm-username", "npm-password" ] ]'
+        INPUTS: ${{ toJSON(inputs) }}
+      run: |
+        "$GITHUB_ACTION_PATH/../scripts/report-missing-inputs.pl"
+
     - name: Checkout
       uses: actions/checkout@v3
 
