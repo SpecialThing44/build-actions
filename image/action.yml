@@ -53,7 +53,6 @@ runs:
       shell: bash
       run: |
         "$GITHUB_ACTION_PATH/../scripts/report-missing-inputs.pl"
-        exit 1
 
     - name: "Google Auth"
       uses: "google-github-actions/auth@v1"

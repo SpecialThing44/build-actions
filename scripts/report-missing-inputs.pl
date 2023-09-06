@@ -22,3 +22,4 @@ if (@required) {
     print "::error ::Some required inputs are missing\n";
     print '::notice ::Required inputs: ['.join(', ', @required)."]\n";
 }
+exit 1;

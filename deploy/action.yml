@@ -42,7 +42,6 @@ runs:
       shell: bash
       run: |
         "$GITHUB_ACTION_PATH/../scripts/report-missing-inputs.pl"
-        exit 1
     - name: Prepare for deployment
       if: env.BRANCH == env.DEFAULT_BRANCH || github.event.pull_request
       env:

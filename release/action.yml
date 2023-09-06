@@ -40,7 +40,6 @@ runs:
       shell: bash
       run: |
         "$GITHUB_ACTION_PATH/../scripts/report-missing-inputs.pl"
-        exit 1
     - name: Validate needs
       if: ${{ inputs.needs-json }}
       uses: garnercorp/build-actions/needs@main
