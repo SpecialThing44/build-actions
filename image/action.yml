@@ -49,9 +49,10 @@ runs:
   using: 'composite'
   steps:
     - name: Validate inputs
-      if: ${{ !inputs.container-project }}
+      if: ${{ !inputs.container-project || !inputs.google-credentials-json != !inputs.google-cloud-sdk-version }}
       shell: bash
       env:
+        CODEPENDENT: '[ [ "google-cloud-sdk-version", "google-credentials-json" ] ]'
         INPUTS: ${{ toJSON(inputs) }}
       run: |
         "$GITHUB_ACTION_PATH/../scripts/report-missing-inputs.pl"
