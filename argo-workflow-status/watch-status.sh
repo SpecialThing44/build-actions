@@ -7,6 +7,10 @@ summarize_and_quit() {
   exit $2
 }
 
+summarize_without_notice() {
+  perl -pe 's/::notice :://' | tee -a "$GITHUB_STEP_SUMMARY"
+}
+
 check_for_updates() {
   if [ -n "$CHECK_FOR_UPDATES_DIR" ]; then
     (
@@ -41,11 +45,13 @@ fi
 export workflow_name="${pr_number_or_branch}-${git_sha}"
 
 if [ -n "$ARGO_URL_BASE" ]; then
-  echo "::notice ::Looking for $ARGO_URL_BASE/workflows/e2e-tests/$workflow_name" | tee -a "$GITHUB_STEP_SUMMARY"
+  echo "::notice ::Looking for $ARGO_URL_BASE/workflows/e2e-tests/$workflow_name" |
+    summarize_without_notice
 fi
 
 if [ -n "$GOOGLE_CLOUD_PROJECT_ID" ]; then
-  echo "::notice ::See logs in https://console.cloud.google.com/logs/query;query=resource.labels.namespace_name%3D%22e2e-tests%22%0Alabels.%22k8s-pod%2Fworkflows_argoproj_io%2Fworkflow%22%3D%22$workflow_name%22;aroundTime=$(date '+%Y-%m-%dT%H:%M:%SZ');duration=PT15M?project=$GOOGLE_CLOUD_PROJECT_ID" | tee -a "$GITHUB_STEP_SUMMARY"
+  echo "::notice ::See logs in https://console.cloud.google.com/logs/query;query=resource.labels.namespace_name%3D%22e2e-tests%22%0Alabels.%22k8s-pod%2Fworkflows_argoproj_io%2Fworkflow%22%3D%22$workflow_name%22;aroundTime=$(date '+%Y-%m-%dT%H:%M:%SZ');duration=PT15M?project=$GOOGLE_CLOUD_PROJECT_ID" |
+    summarize_without_notice
 fi
 
 while true; do
