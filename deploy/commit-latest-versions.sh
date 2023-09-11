@@ -9,6 +9,18 @@ exit_unless_git_dirty() {
 
 if [ -z "$BRANCH" ] || [ -z "$HEAD_SHA" ]; then
   echo "::error ::Usage $0. Please ensure "'`$BRANCH` and `$HEAD_SHA` are set.'
+  if [ -n "$GITHUB_STEP_SUMMARY" ]; then
+    if [ -z "$BRANCH" ]; then
+      missing=' $BRANCH'
+      if [ -z "$HEAD_SHA" ]; then
+        missing="s$missing and"
+      fi
+    fi
+    if [ -z "$HEAD_SHA" ]; then
+      missing="$missing"' $HEAD_SHA'
+    fi
+    echo ":x: Variable$missing must be set" >> "$GITHUB_STEP_SUMMARY"
+  fi
   exit 1
 fi
 
