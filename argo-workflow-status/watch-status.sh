@@ -77,20 +77,16 @@ if [ "$workflow_status" = "Succeeded" ]; then
   exit 0
 fi
 
-while true; do
-  check_for_updates
-  e2e_pod=$(
-    kubectl get pods -n e2e-tests -l "$POD_LABEL_NAME=$POD_LABEL_VALUE" --sort-by=.status.startTime --no-headers |
-    perl -ne 'next unless /$ENV{workflow_name}/; s/^\s*(\S+).*/$1/; print;' |
-    tail -n 1
-  )
-  if [ -z "$e2e_pod" ]; then
-    echo "Unable to find the $POD_LABEL_VALUE pod for $workflow_name"
-    sleep 5
-  else
-    break
-  fi
-done
+check_for_updates
+e2e_pod=$(
+  kubectl get pods -n e2e-tests -l "$POD_LABEL_NAME=$POD_LABEL_VALUE" --sort-by=.status.startTime --no-headers |
+  perl -ne 'next unless /$ENV{workflow_name}/; s/^\s*(\S+).*/$1/; print;' |
+  tail -n 1
+)
+if [ -z "$e2e_pod" ]; then
+  echo "::error ::Unable to find the $POD_LABEL_VALUE pod for $workflow_name to retrieve logs"
+  exit 2
+fi
 
 if [ -z "$CAPTURE_LOG" ]; then
   echo "::add-matcher::$GITHUB_ACTION_PATH/reporter.json"
