@@ -93,6 +93,7 @@ while true; do
 done
 
 if [ -z "$CAPTURE_LOG" ]; then
+  echo "::add-matcher::$GITHUB_ACTION_PATH/reporter.json"
   echo "Showing log for pod: $e2e_pod"
   log_file=/dev/stdout
 else
