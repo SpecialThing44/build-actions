@@ -1,0 +1,15 @@
+{
+  "problemMatcher": [
+    {
+      "owner": "sbt-publishing",
+      "severity": "error",
+      "pattern": [
+        {
+          "regexp" : "(java\\.io\\.IOException): PUT operation failed because the (destination file exists and overwriting is disabled)",
+          "code": 1,
+          "message": 2
+        }
+      ]
+    }
+  ]
+}
