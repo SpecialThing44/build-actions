@@ -52,6 +52,16 @@
                     "message": 1
                 }
             ]
+        },
+        {
+            "owner": "karma-information",
+            "severity": "notice",
+            "pattern": [
+                {
+                    "regexp": "(TOTAL: \\d+ FAILED, \\d+ SUCCESS)",
+                    "message": 1
+                }
+            ]
         }
     ]
 }
