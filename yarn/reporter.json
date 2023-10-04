@@ -42,6 +42,16 @@
                     "message": 1
                 }
             ]
+        },
+        {
+            "owner": "angular-error",
+            "severity": "error",
+            "pattern": [
+                {
+                    "regexp": "NG03\\d{2}: (.*)",
+                    "message": 1
+                }
+            ]
         }
     ]
 }
