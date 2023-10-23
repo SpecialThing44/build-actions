@@ -22,10 +22,14 @@ inputs:
     description: "Node version to use"
     default: "16"
     required: false
-  yarn-use-berry:
-    description: "Use yarn berry"
-    default: "true"
+  yarn-version:
+    description: "Yarn version to use"
+    default: "3.6.4"
     required: false
+  yarn-use-berry:
+    description: "Use yarn berry (~3)"
+    required: false
+    deprecationMessage: "Use yarn-version instead"
   working-directory:
     description: "Directory containing package.json"
     default: "."
@@ -71,7 +75,7 @@ runs:
   using: 'composite'
   steps:
     - name: Validate inputs (yarn berry)
-      if: ${{ !inputs.google-credentials-json != !inputs.google-cloud-sdk-version || (inputs.yarn-use-berry == 'true' && !inputs.npm-username != !inputs.npm-password) }}
+      if: ${{ !inputs.google-credentials-json != !inputs.google-cloud-sdk-version || (inputs.yarn-version >= '2' && !inputs.npm-username != !inputs.npm-password) }}
       shell: bash
       env:
         CODEPENDENT: '[ [ "google-cloud-sdk-version", "google-credentials-json" ], [ "npm-username", "npm-password" ] ]'
@@ -80,7 +84,7 @@ runs:
         "$GITHUB_ACTION_PATH/../scripts/report-missing-inputs.pl"
 
     - name: Validate inputs (yarn v1)
-      if: ${{ !inputs.google-credentials-json != !inputs.google-cloud-sdk-version || (inputs.yarn-use-berry != 'true' && (!inputs.npm-username != !inputs.npm-password || !inputs.npm-username != !inputs.npm-email)) }}
+      if: ${{ !inputs.google-credentials-json != !inputs.google-cloud-sdk-version || (inputs.yarn-version < '2' && (!inputs.npm-username != !inputs.npm-password || !inputs.npm-username != !inputs.npm-email)) }}
       shell: bash
       env:
         CODEPENDENT: '[ [ "google-cloud-sdk-version", "google-credentials-json" ], [ "npm-username", "npm-password", "npm-email" ] ]'
@@ -98,27 +102,28 @@ runs:
 
     - name: Use Yarn Berry
       shell: bash
-      if: inputs.yarn-use-berry == 'true'
+      if: inputs.yarn-version >= '2'
       env:
         THIS_ACTION_PATH: ${{ github.action_path }}
+        yarn_version: ${{ inputs.yarn-version }}
       run: |
         echo "::add-matcher::${THIS_ACTION_PATH}/reporter.json"
         if ! command -v yarn >/dev/null; then
           corepack enable
           corepack prepare yarn@stable --activate
         fi
-        yarn set version berry
+        yarn set version "$yarn_version"
 
     - name: Ensure yarn is available
       shell: bash
-      if: inputs.yarn-use-berry != 'true'
+      if: inputs.yarn-version < '2'
       run: |
         if ! command -v yarn >/dev/null; then
           npm install --global yarn
         fi
 
     - name: Get yarn cache directory path (yarn berry)
-      if: inputs.yarn-use-berry == 'true'
+      if: inputs.yarn-version >= '2'
       working-directory: ${{ inputs.working-directory }}
       shell: bash
       run: |
@@ -127,7 +132,7 @@ runs:
         echo "CACHE_DIR_YARN=$dir" | tee -a "$GITHUB_ENV"
 
     - name: Get yarn cache directory path (yarn v1)
-      if: inputs.yarn-use-berry != 'true'
+      if: inputs.yarn-version < '2'
       working-directory: ${{ inputs.working-directory }}
       shell: bash
       run: |
@@ -144,7 +149,7 @@ runs:
         restore-keys: yarn-${{ runner.os }}-${{ inputs.working-directory }}
 
     - name: Set up yarn credentials
-      if: inputs.npm-username && inputs.npm-password && inputs.yarn-use-berry == 'true'
+      if: inputs.npm-username && inputs.npm-password && inputs.yarn-version >= '2'
       shell: bash
       env:
         NPM_USER: ${{ inputs.npm-username }}
@@ -158,7 +163,7 @@ runs:
         yarn config set npmAuthIdent "$yarn_credentials"
 
     - name: Set up npm credentials
-      if: inputs.npm-username && inputs.npm-password && inputs.npm-email && inputs.yarn-use-berry != 'true'
+      if: inputs.npm-username && inputs.npm-password && inputs.npm-email && inputs.yarn-version < '2'
       # https://github.com/npm/cli/issues/2852
       shell: bash
       env:
