@@ -89,7 +89,7 @@ runs:
         "$GITHUB_ACTION_PATH/../scripts/report-missing-inputs.pl"
 
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Set up Node ${{ inputs.node-version }}
       uses: actions/setup-node@v3

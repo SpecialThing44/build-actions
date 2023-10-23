@@ -28,7 +28,7 @@ runs:
       working-directory: ${{ inputs.working-directory }}
 
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         path: ${{ inputs.working-directory }}
 

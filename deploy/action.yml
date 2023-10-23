@@ -49,7 +49,7 @@ runs:
       env:
         BRANCH: ${{ github.head_ref || github.ref_name }}
         DEFAULT_BRANCH: ${{ inputs.default-branch }}
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         path: _deploy
         repository: ${{ inputs.repository }}
