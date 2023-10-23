@@ -20,7 +20,7 @@ inputs:
     required: false
   node-version:
     description: "Node version to use"
-    default: "16"
+    default: "18"
     required: false
   yarn-version:
     description: "Yarn version to use"
