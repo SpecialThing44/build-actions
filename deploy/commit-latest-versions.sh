@@ -29,8 +29,18 @@ if [ "$BRANCH" != "$DEFAULT_BRANCH" ]; then
   exit 0
 fi
 
-echo -n "$HEAD_SHA$SHA_SUFFIX" > latestVersion
-git add latestVersion
+(
+  if [ -n "$SHA_FORMATTER" ]; then
+    SHA_FORMATTER=$(command -v "$SHA_FORMATTER")
+  fi
+  if [ -x "$SHA_FORMATTER" ]; then
+    "$SHA_FORMATTER"
+  else
+    echo -n "$HEAD_SHA$SHA_SUFFIX"
+  fi
+) > "$VERSION_FILE"
+
+git add "$VERSION_FILE"
 exit_unless_git_dirty
 commitInfo="Update $(basename $(pwd))"
 

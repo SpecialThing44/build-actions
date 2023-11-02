@@ -29,6 +29,13 @@ inputs:
   sha-suffix:
     description: Suffix for image tag
     required: false
+  sha-formatter:
+    description: Formatter for image tag
+    required: false
+  version-file:
+    description: File containing version information
+    required: false
+    default: latestVersion
   default-branch:
     description: Default branch
     default: master
@@ -70,6 +77,8 @@ runs:
         PROJECT_PRETTY: ${{ inputs.project-pretty }}
         HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
         SHA_SUFFIX: ${{ inputs.sha-suffix }}
+        SHA_FORMATTER: ${{ inputs.sha-formatter }}
+        VERSION_FILE: ${{ inputs.version-file }}
         COMMIT_URL: ${{ github.event.head_commit.url }}
         REPO_URL: ${{ github.event.repository.html_url }}
         BRANCH: ${{ github.head_ref || github.ref_name }}
