@@ -31,10 +31,7 @@ fi
 
 (
   if [ -n "$SHA_FORMATTER" ]; then
-    SHA_FORMATTER=$(command -v "$SHA_FORMATTER")
-  fi
-  if [ -x "$SHA_FORMATTER" ]; then
-    "$SHA_FORMATTER"
+    eval $SHA_FORMATTER
   else
     echo -n "$HEAD_SHA$SHA_SUFFIX"
   fi
