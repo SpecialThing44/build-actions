@@ -21,7 +21,7 @@ inputs:
     required: false
   java-version:
     description: "Java version to use"
-    default: "11"
+    default: "21"
     required: false
   prometheus-url:
     description: "Prometheus JMX Jar URL (maven credentials will be used if from the same repository)"

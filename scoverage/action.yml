@@ -11,7 +11,7 @@ inputs:
     required: false
   java-version:
     description: "Java version to use"
-    default: "11"
+    default: "21"
     required: false
   artifact:
     description: "Name for the uploaded artifact"
