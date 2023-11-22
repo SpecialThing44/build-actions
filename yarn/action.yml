@@ -95,12 +95,14 @@ runs:
     - name: Checkout
       uses: actions/checkout@v4
 
+    - name: Enable corepack
+      shell: bash
+      run: corepack enable
+
     - name: Set up Node ${{ inputs.node-version }}
       uses: actions/setup-node@v4
       with:
         node-version: ${{ inputs.node-version }}
-      env:
-        SKIP_YARN_COREPACK_CHECK: 1
 
     - name: Use Yarn Berry
       shell: bash
@@ -111,7 +113,6 @@ runs:
       run: |
         echo "::add-matcher::${THIS_ACTION_PATH}/reporter.json"
         if ! command -v yarn >/dev/null; then
-          corepack enable
           corepack prepare yarn@stable --activate
         fi
         yarn set version "$yarn_version"
