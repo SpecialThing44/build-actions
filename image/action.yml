@@ -44,6 +44,10 @@ inputs:
   build-context:
     description: "The context for the docker"
     required: false
+outputs:
+  image:
+    description: "Generated image reference"
+    value: ${{ steps.build-and-push-image.outputs.image }}
 
 runs:
   using: 'composite'
@@ -77,6 +81,7 @@ runs:
         gcloud auth configure-docker
 
     - name: Build and Push Image
+      id: build-and-push-image
       shell: bash
       env:
         IMAGE: ${{ inputs.image-name || inputs.working-directory }}

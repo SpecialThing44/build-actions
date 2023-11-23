@@ -53,3 +53,5 @@ if [ -n "$PLATFORMS" ]; then
 fi
 
 docker buildx build $PLATFORM_ARGS $BUILD_CONTEXT -t $PUSH_CONTEXT -f $BUILD_DIRECTORY/$DOCKERFILE --push
+
+echo "image=$PUSH_CONTEXT" >> $GITHUB_OUTPUT
