@@ -74,6 +74,9 @@ inputs:
     description: "Directory to publish to npm-registry"
     default: "dist"
     required: false
+  skip-package:
+    description: "Skip packaging"
+    required: false
 
 runs:
   using: 'composite'
@@ -247,6 +250,7 @@ runs:
         gcloud auth configure-docker
 
     - name: Package
+      if: ${{ ! inputs.skip-package }}
       shell: bash
       env:
         WORKING_DIRECTORY: ${{ inputs.working-directory }}
