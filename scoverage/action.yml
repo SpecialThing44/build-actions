@@ -36,6 +36,7 @@ runs:
       run: |
         unzip /tmp/coverage.zip
         ${{ github.action_path }}/synthesize-build-sbt-for-coverage-aggregation.pl
+        $GITHUB_ACTION_PATH/../scripts/add-matchers.sh
       shell: bash
       working-directory: ${{ inputs.working-directory }}
 

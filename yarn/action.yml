@@ -108,10 +108,9 @@ runs:
       shell: bash
       if: inputs.yarn-version >= '2'
       env:
-        THIS_ACTION_PATH: ${{ github.action_path }}
         yarn_version: ${{ inputs.yarn-version }}
       run: |
-        echo "::add-matcher::${THIS_ACTION_PATH}/reporter.json"
+        $GITHUB_ACTION_PATH/../scripts/add-matchers.sh
         if ! command -v yarn >/dev/null; then
           corepack prepare yarn@stable --activate
         fi

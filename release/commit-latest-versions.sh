@@ -1,5 +1,7 @@
 #!/bin/sh -e
 
+$GITHUB_ACTION_PATH/../scripts/add-matchers.sh
+
 exit_unless_git_dirty() {
   if git diff HEAD --quiet; then
     echo "::warning ::There were no git changes (are you rerunning workflow?), exiting..."

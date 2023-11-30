@@ -4,6 +4,8 @@
 set -eu
 shopt -s globstar
 
+$GITHUB_ACTION_PATH/../scripts/add-matchers.sh
+
 # FUNCTIONS
 # Function for setting up git env in the docker container (copied from https://github.com/stefanzweifel/git-auto-commit-action/blob/master/entrypoint.sh)
 _git_setup ( ) {

@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+$GITHUB_ACTION_PATH/../scripts/add-matchers.sh
+
 BUILD_DIRECTORY="."
 DOCKERFILE="Dockerfile"
 

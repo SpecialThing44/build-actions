@@ -186,7 +186,7 @@ runs:
     - name: Run build
       shell: bash
       run: |
-        echo "::add-matcher::$GITHUB_ACTION_PATH/reporter.json"
+        $GITHUB_ACTION_PATH/../scripts/add-matchers.sh
         if [ -n "$BUILD_SCRIPT" ]; then
           $BUILD_SCRIPT $BUILD_SCRIPT_ARGS
         else
