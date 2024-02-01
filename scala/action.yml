@@ -86,7 +86,7 @@ runs:
       uses: actions/checkout@v4
 
     - name: "Google Auth"
-      uses: "google-github-actions/auth@v1"
+      uses: "google-github-actions/auth@v2"
       if: ${{ inputs.google-credentials-json && inputs.google-cloud-sdk-version && ! env.ACT }}
       with:
         credentials_json: "${{ inputs.google-credentials-json }}"
