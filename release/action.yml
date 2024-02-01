@@ -5,6 +5,10 @@ branding:
   icon: 'upload-cloud'
   color: 'orange'
 inputs:
+  checkout:
+    description: Whether or not to checkout the repository you are currently working in
+    required: false
+    default: "true"
   repository:
     description: Repository containing test information
     required: true
@@ -48,7 +52,7 @@ runs:
       with:
         needs-json: ${{ inputs.needs-json }}
     - name: Prepare for E2E Deployment
-      if: env.BRANCH == env.DEFAULT_BRANCH || github.event.pull_request
+      if: (inputs.checkout == 'true') && (env.BRANCH == env.DEFAULT_BRANCH || github.event.pull_request)
       env:
         BRANCH: ${{ github.head_ref || github.ref_name }}
         DEFAULT_BRANCH: ${{ inputs.default-branch }}

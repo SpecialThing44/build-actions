@@ -1,6 +1,10 @@
 name: 'Scoverage Report'
 description: 'Generate Aggregate Scoverage Report'
 inputs:
+  checkout:
+    description: Whether or not to checkout the repository you are currently working in
+    required: false
+    default: "true"
   working-directory:
     description: "Directory containing Scala projects with scoverage data to aggregate"
     default: .
@@ -28,6 +32,7 @@ runs:
       working-directory: ${{ inputs.working-directory }}
 
     - name: Checkout
+      if: ${{ inputs.checkout == 'true' }}
       uses: actions/checkout@v4
       with:
         path: ${{ inputs.working-directory }}

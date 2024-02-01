@@ -5,6 +5,10 @@ branding:
   icon: 'aperture'
   color: 'purple'
 inputs:
+  checkout:
+    description: Whether or not to checkout the repository you are currently working in
+    required: false
+    default: "true"
   npm-registry:
     description: "The npm registry from which to retrieve packages"
     default: "https://registry.npmjs.org/"
@@ -93,6 +97,7 @@ runs:
         "$GITHUB_ACTION_PATH/../scripts/report-missing-inputs.pl"
 
     - name: Checkout
+      if: ${{ inputs.checkout == 'true' }}
       uses: actions/checkout@v4
 
     - name: Enable corepack

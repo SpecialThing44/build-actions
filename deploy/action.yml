@@ -5,6 +5,10 @@ branding:
   icon: 'upload-cloud'
   color: 'purple'
 inputs:
+  checkout:
+    description: Whether or not to checkout the repository you are currently working in
+    required: false
+    default: "true"
   repository:
     description: Repository containing deployment information
     required: true
@@ -52,7 +56,7 @@ runs:
       run: |
         "$GITHUB_ACTION_PATH/../scripts/report-missing-inputs.pl"
     - name: Prepare for deployment
-      if: env.BRANCH == env.DEFAULT_BRANCH || github.event.pull_request
+      if: (inputs.checkout == 'true') && (env.BRANCH == env.DEFAULT_BRANCH || github.event.pull_request)
       env:
         BRANCH: ${{ github.head_ref || github.ref_name }}
         DEFAULT_BRANCH: ${{ inputs.default-branch }}
