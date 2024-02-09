@@ -29,7 +29,15 @@ inputs:
   prettier-options:
     description: Options for the `prettier` command
     required: false
-    default: "--write **/*.js"
+    default: "--write"
+  file-extensions:
+    description: If not specified, prettier will be interrogated for supported extensions
+    required: false
+    default: ""
+  check-paths:
+    description:
+    required: false
+    default: "**"
   dry:
     description: Running the script in dry mode just shows whether there are files that should be prettified or not
     required: false
@@ -37,11 +45,11 @@ inputs:
   prettier-version:
     description: Version of prettier to use. Otherwise defaults to latest prettier version unless detect-prettier-version is specified. 
     required: false
-    default: "false"
+    default: ""
   working-directory:
     description: Specify a directory to cd into before installing prettier and running it
     required: false
-    default: "false"
+    default: ""
   only-changed:
     description: Only prettify files changed in the last commit, can't be used with file-pattern!
     required: false
@@ -57,30 +65,71 @@ inputs:
   push-to-remote:
     description: Whether or not to push prettified code to a remote
     required: false
-    default: "true"
+    default: "false"
   checkout:
     description: Whether or not to checkout the repository you are currently working in
     required: false
     default: "true"
+  checkout-token:
+    description: Token to use for checking out repository
+    required: false
+    default: ""
+  checkout-ssh-key:
+    description: ssh key to use for checking out repository
+    required: false
+    default: ""
   detect-prettier-version:
     description: Whether or not to detect the prettier version from devDependencies
     required: false
     default: "true"
+  update-git_blame_ignore_revs:
+    description: Where to update `.git_blame_ignore_revs`
+    required: false
+    default: "false"
+  debug:
+    description: Debug action
+    required: false
+    default: ""
 
 runs:
   using: "composite"
   steps:
-    - name: Clone repository
-      uses: actions/checkout@v4
-      working-directory: ${{ inputs.working-directory }}
-      if: inputs.checkout == 'true'
-
-    - name: Stub remote to suppress pushes
-      if: inputs.push-to-remote != 'true'
+    - name: Check if we can push to remote
       working-directory: ${{ inputs.working-directory }}
       shell: bash
-      run:
-        git remote rename origin github;
+      env:
+        UPDATE_GIT_BLAME_IGNORE: ${{ inputs.update-git_blame_ignore_revs }}
+        PUSH_TO_REMOTE: ${{ inputs.push-to-remote }}
+        CAN_PUSH_TO_REMOTE: ${{ github.event_name == 'push' || (github.event.pull_request.base.user.id == github.event.pull_request.head.user.id) }}
+      run: |
+        if [ "$PUSH_TO_REMOTE" = 'true' ]; then
+          if [ "$UPDATE_GIT_BLAME_IGNORE" = 'true' ]; then
+            if [ "$CAN_PUSH_TO_REMOTE" = 'true' ]; then
+              echo "INPUT_UPDATE_GIT_BLAME_IGNORE_REVS=true" >> "$GITHUB_ENV"
+            fi
+          else
+            echo '::warning title=Incompatible option::update-git_blame_ignore_revs=true only works with push-to-remote=true'
+          fi
+          echo "PUSH_TO_REMOTE=true" >> "$GITHUB_ENV"
+        else
+          echo "PUSH_TO_REMOTE=false" >> "$GITHUB_ENV"
+        fi
+
+    - name: Clone repository
+      uses: actions/checkout@v4
+      if: inputs.checkout == 'true'
+      with:
+        path: ${{ inputs.working-directory }}
+        ssh-key: ${{ inputs.checkout-ssh-key }}
+        token: ${{ inputs.checkout-token || github.token }}
+        persist-credentials: ${{ env.PUSH_TO_REMOTE }}
+
+    - name: Stub remote to suppress pushes
+      working-directory: ${{ inputs.working-directory }}
+      if: ${{ env.PUSH_TO_REMOTE != 'true' }}
+      shell: bash
+      run: |
+        git remote rename origin github
         git remote add origin .
 
     - name: Get prettier version from dependencies
@@ -89,17 +138,23 @@ runs:
       working-directory: ${{ inputs.working-directory }}
       shell: bash
       run: |
-        prettier_version=$(jq -r '.devDependencies.prettier' package.json)
-        echo "prettier_version=$prettier_version" >> $GITHUB_OUTPUT
+        if [ -s package.json ]; then
+          prettier_version=$(jq -r '.devDependencies.prettier // ""' package.json)
+          echo "prettier_version=$prettier_version" >> $GITHUB_OUTPUT
+        fi
+        if [ -z "$prettier_version" ]; then
+          echo '::warning title=Prettier version detection::Failed to detect prettier version. Using default.'
+        fi
 
     - name: Prettify code!
       shell: bash
-      run: ${{ github.action-path }}/entrypoint.sh
+      run: ${{ github.action_path }}/entrypoint.sh
       env:
         INPUT_COMMIT_MESSAGE: ${{ inputs.commit-message }}
         INPUT_COMMIT_DESCRIPTION: ${{ inputs.commit-description }}
         INPUT_SAME_COMMIT: ${{ inputs.same-commit }}
         INPUT_COMMIT_OPTIONS: ${{ inputs.commit-options }}
+        INPUT_PUSH_OPTIONS: ${{ inputs.push-options }}
         INPUT_FILE_PATTERN: ${{ inputs.file-pattern }}
         INPUT_PRETTIER_OPTIONS: ${{ inputs.prettier-options }}
         INPUT_DRY: ${{ inputs.dry }}
@@ -108,16 +163,9 @@ runs:
         INPUT_PRETTIER_PLUGINS: ${{ inputs.prettier-plugins }}
         INPUT_WORKING_DIRECTORY: ${{ inputs.working-directory }}
         INPUT_GITHUB_TOKEN: ${{ inputs.github-token }}
-
-    - name: Check for changes
-      if: inputs.push-to-remote != 'true'
-      working-directory: ${{ inputs.working-directory }}
-      shell: bash
-      run: |
-        if ! git diff $GITHUB_SHA..HEAD --exit-code > /dev/null; then
-          git log $GITHUB_SHA..HEAD | cat
-          exit 1
-        fi
+        INPUT_FILE_EXTENSIONS : ${{ inputs.file-extensions}}
+        INPUT_CHECK_PATHS: ${{ inputs.check-paths }}
+        INPUT_DEBUG: ${{ inputs.debug }}
 
 branding:
   icon: "award"

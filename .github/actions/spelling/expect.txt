@@ -5,10 +5,8 @@ corepack
 debian
 garnercorp
 gcloud
-gmail
 gnupg
 gpg
-grosserconrad
 javaagent
 JDK
 keyserver

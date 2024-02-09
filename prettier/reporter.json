@@ -1,0 +1,24 @@
+{
+    "problemMatcher": [
+        {
+            "owner": "git-push-permission-denied",
+            "severity": "error",
+            "pattern": [
+                {
+                    "regexp": "^(remote: Permission to (?:.*\\.git) denied to (?:.*))",
+                    "message": 1
+                }
+            ]
+        },
+        {
+            "owner": "github-push-permission-denied",
+            "severity": "error",
+            "pattern": [
+                {
+                    "regexp": "!.*\\[remote rejected\\].* ->.*\\((.*)\\)",
+                    "message": 1
+                }
+            ]
+        }
+    ]
+}
