@@ -190,11 +190,11 @@ prettier_output_summary
 # Ignore node modules and other action created files
 if [ -d 'node_modules' ]; then
   rm -r node_modules/
-  git checkout -- node_modules/ 2> /dev/null >/dev/null
+  git checkout -- node_modules/ 2> /dev/null >/dev/null || true
 fi
 
 if [ -f 'package-lock.json' ]; then
-  git checkout -- package-lock.json 2> /dev/null >/dev/null
+  git checkout -- package-lock.json 2> /dev/null >/dev/null || true
 fi
 
 # To keep runtime good, just continue if something was changed
