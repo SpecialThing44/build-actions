@@ -1,0 +1,40 @@
+name: 'Workflow Status Slack Notification'
+description: 'Send notifications to Slack about the status of a github workflow'
+inputs:
+  slack-webhook:
+    description: 'Slack webhook URL'
+    required: true
+  slack-username:
+    description: 'Username to display in the message'
+    required: true
+  slack-channel:
+    description: 'Slack channel to post the message'
+    required: true
+  workflow-status:
+    description: 'The status of the workflow'
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Notify Slack Channel
+      shell: bash
+      run: |
+        color="warning"
+          if [ "${{ inputs.workflow-status }}" == "failed" ]; then
+            color="danger"
+          elif [ "${{ inputs.workflow-status }}" == "succeeded" ]; then
+            color="good"
+          fi
+        curl "${{ inputs.slack-webhook }}" -X POST -H "Content-Type: application/json" \
+          --data '{
+            "username": "${{ inputs.slack-username }}",
+            "channel": "${{ inputs.slack-channel }}", 
+            "attachments": [
+            {
+                "title": "[${{ github.repository }}] ${{ github.workflow }} ${{ inputs.workflow-status }} on ${{ github.head_ref }}",
+                "text": "*<https://github.com/${{ github.repository }}/commit/${{ github.event.pull_request.head.sha || github.sha }}|Commit>* *<https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|Workflow>*",
+                "color": "'$color'"
+            }
+          ]
+        }'
