@@ -27,8 +27,8 @@ bump_version() {
             patch=$((patch + 1))
             ;;
         *)
-            echo "Invalid bump type: $bump_type"
-            return 1
+            echo "::error ::Invalid bump type: $bump_time" >&2
+            exit 1
             ;;
     esac
 
@@ -72,7 +72,13 @@ else
     bump_type="patch"
 fi
 
-current_version=$(perl -ne 'next unless s/.*$ENV{VERSION_PATTERN}/$1/; print' "$VERSION_FILE")
+if [ -n "$CURRENT_VERSION" ]; then
+    current_version="$CURRENT_VERSION"
+else
+    current_version=$(perl -ne 'next unless s/.*$ENV{VERSION_PATTERN}/$1/; print' "$VERSION_FILE")
+fi
+echo "VERSION_PATTERN: $VERSION_PATTERN"
+
 
 new_version=$(bump_version "$current_version" "$bump_type")
 
