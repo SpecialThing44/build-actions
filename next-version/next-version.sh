@@ -27,7 +27,7 @@ bump_version() {
             patch=$((patch + 1))
             ;;
         *)
-            echo "::error ::Invalid bump type: $bump_time" >&2
+            echo "::error ::Invalid bump type: $bump_type" >&2
             exit 1
             ;;
     esac
@@ -80,7 +80,7 @@ fi
 echo "VERSION_PATTERN: $VERSION_PATTERN"
 
 
-new_version=$(bump_version "$current_version" "$bump_type")
+new_version=$(bump_version "$current_version" "badtype")
 
 commit_log=$(mktemp)
 (

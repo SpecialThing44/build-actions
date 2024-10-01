@@ -76,7 +76,7 @@ runs:
       env:
         VERSION_PATTERN_NODE: '"version": "(\d+\.\d+\.\d+)"'
         VERSION_PATTERN_SBT: 'ThisBuild / version := "(\d+\.\d+\.\d+)"'
-    - uses: Garnercorp/build-actions/next-version@automatic-version-bumping
+    - uses: SpecialThing44/build-actions/next-version@automatic-version-bumping
       id: bump
       with:
         version-file-path: ${{ inputs.version-file-path }}
